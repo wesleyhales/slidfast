@@ -1,0 +1,11 @@
+CACHE MANIFEST
+# 2011-08-18:v2
+
+CACHE:
+demo3.html
+styles/demo1.css
+js/demo1.js
+js/demo2.js
+
+NETWORK:
+*
