@@ -46,9 +46,11 @@ function slideTo(target) {
     //6. Bring in the new page.
     FOCUS_PAGE.className = 'page transition stage-center';
 
+    //todo - check to see if one already exists for that page
+    new Slider("page-container", "sliderFill", FOCUS_PAGE.id, 100, 0,null);
 }
 
-function flip(id) {
+function flip(id) {               9
     //get a handle on the flippable region
     var front = getElement('front');
     var back = getElement('back');
@@ -77,14 +79,11 @@ function flip(id) {
     }
 
     function timerStart() {
-            return (new Date()).getTime();
+        return (new Date()).getTime();
     }
 
     function timerEnd(start, id) {
-        // PPK's method: http://www.quirksmode.org/blog/archives/2009/08/when_to_read_ou.html
-        setTimeout(function () {
-            document.getElementById(id).value = ((new Date()).getTime() - start) + ' milliseconds';
-        }, 10);
+        return ((new Date()).getTime() - start);
     }
 
     function log(statement){

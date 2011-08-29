@@ -132,8 +132,6 @@ function ajax(url, callback, async) {
 var count = 0;
 var insertPages = function(text, originalLink) {
     var frame = getFrame();
-    //write the ajax response text to the frame and let
-    //the browser do the work
     frame.write(text);
 
     //now we have a DOM to work with

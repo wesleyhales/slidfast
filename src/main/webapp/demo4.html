@@ -19,205 +19,245 @@
 <script type="text/javascript">
 
 
-    //    demo3----------------------------checking network type
+//    demo3----------------------------checking network type
 
-   //2 types of of data loading scenarios, straightup request and the changing of state in connection (event)
-   var appCache = window.applicationCache;
-   var disabledLinks = '';
+//2 types of of data loading scenarios, straightup request and the changing of state in connection (event)
+var appCache = window.applicationCache;
+var disabledLinks = '';
 
-   window.addEventListener('load', function(e) {
-       if (navigator.onLine) {
-          //new page load
-          processOnline();
-          new Slider("page-container", "sliderFill", "home-page", 100, 0,null);
-       }else{
-          //the app is probably already cached and (maybe) bookmarked...
-          processOffline();
-       }
-   }, false);
+window.addEventListener('load', function(e) {
+   if (navigator.onLine) {
+      //new page load
+      processOnline();
+   }else{
+      //the app is probably already cached and (maybe) bookmarked...
+      processOffline();
+   }
+}, false);
 
-    window.addEventListener("offline", function(e) {
-       //we just lost our connection and entered offline mode, disable eternal link
-       processOffline(e.type);
-    }, false);
+window.addEventListener("offline", function(e) {
+   //we just lost our connection and entered offline mode, disable eternal link
+   processOffline(e.type);
+}, false);
 
-    window.addEventListener("online", function(e) {
-      //just came back online, enable links
-      processOnline(e.type);
-    }, false);
+window.addEventListener("online", function(e) {
+  //just came back online, enable links
+  processOnline(e.type);
+}, false);
 
-    function processOnline(event){
+function processOnline(event){
 
-        setupApp();
-        checkAppCache();
+    setupApp();
+    checkAppCache();
 
-        //reset our once disabled offline links
-        if(event){
-            for (i = 0; i < disabledLinks.length; i += 1) {
-                disabledLinks[i].onclick = null;
-            }
-        }
-
-        function checkAppCache(){
-            //check for a new appCache
-            window.applicationCache.addEventListener('updateready', function(e) {
-               //alert('checking appcache' + window.applicationCache.status);
-                if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
-                  // Browser downloaded a new app cache.
-                  // Swap it in and reload the page to get the new hotness.
-                  window.applicationCache.swapCache();
-                  if (confirm('A new version of this site is available. Load it?')) {
-                    window.location.reload();
-                  }
-                }else{}
-            }, false);
-        }
-
-    }
-
-    function setupApp(){
-        // create a custom object if navigator.connection isn't available
-        var connection = navigator.connection || {'type':'0'};
-        if (connection.type == 2 || connection.type == 1){
-            //wifi/ethernet
-            //Coffee Wifi latency: ~75ms-200ms
-            //Home Wifi latency: ~25-35ms
-            //Coffee Wifi DL speed: ~550kbps-650kbps
-            //Home Wifi DL speed: ~1000kbps-2000kbps
-            fetchAndCache(true);
-        }else if (connection.type == 3){
-        //edge
-            //ATT Edge latency: ~400-600ms
-            //ATT Edge DL speed: ~2-10kbps
-            fetchAndCache(false);
-        }else if (connection.type == 2){
-            //3g
-            //ATT 3G latency: ~400ms
-            //Verizon 3G latency: ~150-250ms
-            //ATT 3G DL speed: ~60-100kbps
-            //Verizon 3G DL speed: ~20-70kbps
-            fetchAndCache(false);
-        }else{
-        //unknown
-            fetchAndCache(true);
-        }
-    }
-
-    function processOffline() {
-        setupApp();
-        //disable external links until we come back - setting the bounds of app
-        disabledLinks = getUnconvertedLinks(document);
-        var i;
-        //helper for onlcick below
-        var onclickHelper = function(e){
-            return function(f) {
-                alert('This app is currently offline and cannot access the hotness');return false;
-            }
-        };
+    //reset our once disabled offline links
+    if(event){
         for (i = 0; i < disabledLinks.length; i += 1) {
-            if(disabledLinks[i].onclick == null){
-            //alert user we're not online
-            disabledLinks[i].onclick = onclickHelper(disabledLinks[i].href);
-
-            }
+            disabledLinks[i].onclick = null;
         }
     }
 
+    function checkAppCache(){
+        //check for a new appCache
+        window.applicationCache.addEventListener('updateready', function(e) {
+           //alert('checking appcache' + window.applicationCache.status);
+            if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+              // Browser downloaded a new app cache.
+              // Swap it in and reload the page to get the new hotness.
+              window.applicationCache.swapCache();
+              if (confirm('A new version of this site is available. Load it?')) {
+                window.location.reload();
+              }
+            }else{}
+        }, false);
+    }
 
-    function Slider(track, backfill, page, maxRange, currentPos,callback)
-    {
-        var track = document.getElementById(track);
-        var backfill = document.getElementById(backfill);
-        var page = document.getElementById(page);
-        var maxRange = maxRange;
-        var currentPos = page.style.left;
-        var thumbWidth = 20;
-        var borderWidth = 10;
+}
 
-        var originalTouch = 0;
-        var originalX = 0;
+function setupApp(){
+    // create a custom object if navigator.connection isn't available
+    var connection = navigator.connection || {'type':'0'};
+    if (connection.type == 2 || connection.type == 1){
+        //wifi/ethernet
+        //Coffee Wifi latency: ~75ms-200ms
+        //Home Wifi latency: ~25-35ms
+        //Coffee Wifi DL speed: ~550kbps-650kbps
+        //Home Wifi DL speed: ~1000kbps-2000kbps
+        fetchAndCache(true);
+    }else if (connection.type == 3){
+    //edge
+        //ATT Edge latency: ~400-600ms
+        //ATT Edge DL speed: ~2-10kbps
+        fetchAndCache(false);
+    }else if (connection.type == 2){
+        //3g
+        //ATT 3G latency: ~400ms
+        //Verizon 3G latency: ~150-250ms
+        //ATT 3G DL speed: ~60-100kbps
+        //Verizon 3G DL speed: ~20-70kbps
+        fetchAndCache(false);
+    }else{
+    //unknown
+        fetchAndCache(true);
+    }
+}
 
-        var slideRight = false;
-        var slideLeft = false;
-        function sliderMove(event) {
+function processOffline() {
+    setupApp();
+    //disable external links until we come back - setting the bounds of app
+    disabledLinks = getUnconvertedLinks(document);
+    var i;
+    //helper for onlcick below
+    var onclickHelper = function(e){
+        return function(f) {
+            alert('This app is currently offline and cannot access the hotness');return false;
+        }
+    };
+    for (i = 0; i < disabledLinks.length; i += 1) {
+        if(disabledLinks[i].onclick == null){
+        //alert user we're not online
+        disabledLinks[i].onclick = onclickHelper(disabledLinks[i].href);
 
+        }
+    }
+}
+
+{
+  window.addEventListener('load', function(e) {
+    //
+  }, false);
+}
+
+function Slider(track, backfill, page, maxRange, currentPos,callback)
+{
+    var track = document.getElementById(track);
+    var backfill = document.getElementById(backfill);
+    var page = document.getElementById(page);
+    var maxRange = maxRange;
+    var currentPos = page.style.left;
+    var thumbWidth = 20;
+    var borderWidth = 10;
+
+    var originalTouch = 0;
+    var originalX = 0;
+
+    var slideRight = false;
+    var slideLeft = false;
+    var swipeThreshold = 201;
+    var timer;
+    var swipeTime = 201;
+    function sliderMove(event) {
+
+        if(event.type != 'touchend'){
+            //get position after transform
             var curTransform = new WebKitCSSMatrix(window.getComputedStyle(page).webkitTransform);
             var pagePosition = curTransform.m41;
-            var x = event.touches[0].clientX - pagePosition;
-            var relativePos = ((x/2) * 100) / (track.clientWidth);
 
-            //var relativePos = ((x-thumbWidth/2) * maxRange) / (slider.clientWidth + borderWidth - thumbWidth);
+            //holder for current x position
+            var currentTouch = event.touches[0].clientX;
 
             if(event.type == 'touchstart'){
                 //reset measurement to 0 each time a new touch begins
                 //todo - make this only applicable to 1 finger touch
-                originalX = event.touches[0].clientX;
+                originalTouch = event.touches[0].clientX;
+                timer = timerStart();
             }
 
-            var pageFlipThreshold = 50;
+            //get the difference between where we are now vs. where we started on first touch
+            var difference = currentTouch - originalTouch;
 
-            //if page is at 0 or greater
-            if(x != originalX && pagePosition >= 0){
-            //moving current page to the right
-            //so means we're flipping backwards
-               if(pagePosition > pageFlipThreshold){
-                   //user wants to go backward
-                   //slide needs to occur on touchend and cancel the slideRight
-                   slideLeft = true;
-                   slideRight = false;
-                }
-            }else if(pagePosition < pageFlipThreshold) {
-            //go back
-                if(pagePosition < -50){
-                   //user wants to go forward
-                   //slide needs to occur on touchend and cancel the slideLeft
-                   slideRight = true;
-                   slideLeft = false;
-                }
+            currentPos = difference;
+
+            //logging
+
+            //getElement('numbers2').value = 'pagePosition: ' + pagePosition + ' difference: ' + difference;
+            //getElement('numbers3').value = 'currentPos: ' + currentPos + 'clientX: ' + event.touches[0].clientX;
+            //getElement('decision').value = 'slideLeft:' + slideLeft + ' slideRight:' + slideRight;
+
+        }else{
+            swipeTime = timerEnd(timer,'numbers2');
+            currentPos = 0;
+        }
+
+        //getElement('numbers').value = difference;
+        //getElement('numbers2').value = swipeTime;
+        //how far do we go before a page flip occurs
+        var pageFlipThreshold = 500;
+        getElement('numbers').value = pagePosition;
+        //if page has actually moved and if page is at 0 or greater
+        if(pagePosition > 0){
+        //moving current page to the right
+        //so means we're flipping backwards
+            if(swipeTime < swipeThreshold){
+               //user wants to go backward
+               //slide needs to occur on touchend and cancel the slideRight
+               slideRight = true;
+               slideLeft = false;
             }
 
-            var iPad2PPI = 132;
-            var difference = x - originalX;
-            getElement('numbers').value = currentPos ;
-            //divide by PPI - iPad2 = 132 ppi
-            currentPos = (pagePosition) + (100 * difference/iPad2PPI);
-            getElement('decision').value = 'slideLeft:' + slideLeft + ' slideRight:' + slideRight;
-            positionThumb();
-        }
+           if(pagePosition > pageFlipThreshold){
+               //user wants to go backward
+               //slide needs to occur on touchend and cancel the slideRight
 
-        function positionThumb(end)
-        {
-            //backfill.style.width = currentPos + "px";
-            //thumb.style.left = relativePos - borderWidth - (thumbWidth/2) + "px";
-            var posLeft = Math.round(currentPos);
-            //getElement('numbers').value = posLeft;
-            page.style.webkitTransform = 'translate3d('+ posLeft + 'px, 0, 0)';
-            if(end){
-                page.style.WebkitTransition = 'all .4s ease-out';
-                //page.style.WebkitTransition = 'all .4s cubic-bezier(0,.58,.58,1)'
-            }else{
-                page.style.WebkitTransition = 'all .2s ease-out';
+               slideRight = true;
+               slideLeft = false;
+            }
+        }else{
+        //current page is sliding to the left
+
+            if(swipeTime < swipeThreshold){
+               //user wants to go backward
+               //slide needs to occur on touchend and cancel the slideRight
+               slideRight = false;
+               slideLeft = true;
+            }
+
+            if(pagePosition < pageFlipThreshold){
+               //user wants to go forward
+               //slide needs to occur on touchend and cancel the slideLeft
+               slideLeft = true;
+               slideRight = false;
             }
         }
-
-        track.ontouchstart = function(event) {
-        //alert(event.touches[0].clientX);
-            sliderMove(event);
-        }
-        track.ontouchmove = function(event) {
-            event.preventDefault();
-            sliderMove(event);
-        }
-        track.ontouchend = function(event) {
-
-            if((currentPos) < 0 || (currentPos) > 0){
-                currentPos = 0;
-                positionThumb(true);
-            }
-        }
-
+        getElement('decision').value = 'slideLeft:' + slideLeft + ' slideRight:' + slideRight;
         positionThumb();
     }
+
+    function positionThumb(end)
+    {
+        //backfill.style.width = currentPos + "px";
+        var posLeft = Math.round(currentPos);
+        //getElement('numbers').value = posLeft;
+        page.style.webkitTransform = 'translate3d('+ posLeft + 'px, 0, 0)';
+        if(end){
+            page.style.WebkitTransition = 'all .4s ease-out';
+            //page.style.WebkitTransition = 'all .4s cubic-bezier(0,.58,.58,1)'
+        }else{
+            page.style.WebkitTransition = 'all .2s ease-out';
+        }
+        page.style.WebkitUserSelect = 'none';
+    }
+
+    track.ontouchstart = function(event) {
+    //alert(event.touches[0].clientX);
+        sliderMove(event);
+    }
+    track.ontouchmove = function(event) {
+        event.preventDefault();
+        sliderMove(event);
+    }
+    track.ontouchend = function(event) {
+        sliderMove(event);
+
+        if(slideLeft){
+           slideTo('products-page');
+        }else if (slideRight){
+            slideTo('home-page');
+        }
+    }
+
+    positionThumb();
+}
 
 
     //    demo3----------------------------checking network type end
@@ -228,7 +268,7 @@
 <body onload="hideURLbar()">
 <div id="browser">
 
-     <input type="text" value="" id="numbers"/> <input type="text" value="" id="decision" style="width:300px"/>
+      <input type="text" value="" id="numbers3" style="width:300px"/><input type="text" value="" id="numbers" style="width:300px"/><input type="text" value="" id="numbers2" style="width:300px"/> <input type="text" value="" id="decision" style="width:300px"/>
     <nav class="primary">
         <ul>
             <li><a href="#" onclick="slideTo('home-page')">Home</a></li>
@@ -270,5 +310,8 @@
 </div>
 
 </body>
+  <script type="text/javascript">
 
+
+        </script>
 </html>
