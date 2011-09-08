@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" manifest="demo.appcache">
 
 <head>
-<title>HTML5Rocks Article Demo 4</title>
+<title>HTML5Rocks Article Demo 3</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0"/>
 <!-- enable full-screen mode -->
@@ -11,13 +11,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <link rel="stylesheet" href="styles/demo1.css" type="text/css"/>
 <script type="text/javascript" src="js/demo1.js"></script>
-<script type="text/javascript" src="js/demo2.js"></script>
+<script type="text/javascript" src="js/fetch-cache.js"></script>
 
 <style type="text/css">
 
 </style>
 <script type="text/javascript">
-
 
 //    demo3----------------------------checking network type
 
@@ -122,146 +121,16 @@ function processOffline() {
     }
 }
 
-{
-  window.addEventListener('load', function(e) {
-   //todo - check to see if one already exists for that page
-    new Slider("page-container", "sliderFill", "home-page", 100, 0,null);
-  }, false);
-}
-
-function Slider(track, backfill, page, maxRange, currentPos,callback)
-{
-    track = document.getElementById(track);
-    backfill = document.getElementById(backfill);
-    page = document.getElementById(page);
-    currentPos = page.style.left;
-
-    var thumbWidth = 20;
-    var borderWidth = 10;
-
-    var originalTouch = 0;
-    var originalX = 0;
-
-    var slideDirection = null;
-    var cancel = false;
-    var swipeThreshold = 201;
-
-    var swipeTime;
-    var timer;
-    var maxPos;
-
-    function pageMove(event) {
-        //get position after transform
-        var curTransform = new WebKitCSSMatrix(window.getComputedStyle(page).webkitTransform);
-        var pagePosition = curTransform.m41;
-
-        //make sure finger is not released
-        if(event.type != 'touchend'){
-            //holder for current x position
-            var currentTouch = event.touches[0].clientX;
-
-            if(event.type == 'touchstart'){
-                //reset measurement to 0 each time a new touch begins
-                originalTouch = event.touches[0].clientX;
-                timer = timerStart();
-            }
-
-            //get the difference between where we are now vs. where we started on first touch
-            currentPos = currentTouch - originalTouch;
-
-            //figure out if we are cancelling the swipe event
-            //simple gauge for finding the highest positive or negative number
-            if(pagePosition < 0){
-               if(maxPos < pagePosition) {
-                    cancel = true;
-                }else{
-                    maxPos = pagePosition;
-                }
-            }else{
-                if(maxPos > pagePosition) {
-                    cancel = true;
-                }else {
-                    maxPos = pagePosition;
-                }
-            }
-
-        }else{
-            //touch event comes to an end
-            swipeTime = timerEnd(timer,'numbers2');
-            currentPos = 0;
-
-            //how far do we go before a page flip occurs
-            var pageFlipThreshold = 75;
-
-            if(!cancel){
-                //find out which direction we're going on x axis
-                if(pagePosition >= 0){
-                //moving current page to the right
-                //so means we're flipping backwards
-                   if((pagePosition > pageFlipThreshold) || (swipeTime < swipeThreshold)){
-                       //user wants to go backward
-                       slideDirection = 'right';
-                    }else{
-                       slideDirection = null;
-                    }
-                }else{
-                //current page is sliding to the left
-                    if((swipeTime < swipeThreshold) || (pagePosition < pageFlipThreshold)){
-                       //user wants to go forward
-                       slideDirection = 'left';
-                    }else{
-                       slideDirection = null;
-                    }
-
-                }
-            }
-            maxPos = 0;
-            cancel = false;
-        }
-
-        positionPage();
-    }
-
-    function positionPage(end)
-    {
-        page.style.webkitTransform = 'translate3d('+ currentPos + 'px, 0, 0)';
-        if(end){
-            page.style.WebkitTransition = 'all .4s ease-out';
-            //page.style.WebkitTransition = 'all .4s cubic-bezier(0,.58,.58,1)'
-        }else{
-            page.style.WebkitTransition = 'all .2s ease-out';
-        }
-        page.style.WebkitUserSelect = 'none';
-    }
-
-    track.ontouchstart = function(event) {
-    //alert(event.touches[0].clientX);
-        pageMove(event);
-    }
-    track.ontouchmove = function(event) {
-        event.preventDefault();
-        pageMove(event);
-    }
-    track.ontouchend = function(event) {
-        pageMove(event);
-        if(slideDirection == 'left'){
-           slideTo('products-page');
-        }else if (slideDirection == 'right'){
-            slideTo('home-page');
-        }
-    }
-
-    positionPage(true);
-}
 
 
-    //    demo3----------------------------checking network type end
+//    demo3----------------------------checking network type end
 
 </script>
 
 </head>
 <body onload="hideURLbar()">
 <div id="browser">
+
 
     <nav class="primary">
         <ul>
@@ -275,6 +144,7 @@ function Slider(track, backfill, page, maxRange, currentPos,callback)
     <div id="page-container">
 
         <div id="front" class="normal">
+
             <div id="home-page" class="page">
                 <h1>Home Page</h1>
                 <a href="demo2/home-detail.html" class="fetch">Find out more about the home page!</a>
@@ -303,8 +173,5 @@ function Slider(track, backfill, page, maxRange, currentPos,callback)
 </div>
 
 </body>
-  <script type="text/javascript">
 
-
-        </script>
 </html>
