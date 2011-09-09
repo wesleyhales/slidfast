@@ -151,15 +151,14 @@ var insertPages = function(text, originalLink) {
     for (i = 0; i < pageCount; i += 1) {
         //the new page will always be at index 0 because
         //the last one just got popped off the stack with appendChild (below)
-        //todo - handle better
         var newPage = incomingPages[0];
+
         //stage the new pages to the left by default
-        //(todo check for predefined stage class)
         newPage.className = 'page stage-left';
 
         //find out where to insert
         var location = newPage.parentNode.id == 'back' ? 'back' : 'front';
-        //alert();
+
         try{
             //mobile safari will not allow nodes to be transferred from one DOM to another so
             //we must use adoptNode()

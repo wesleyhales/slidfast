@@ -49,7 +49,7 @@ a {
     color: #fff;
 }
 
-    /*----------------------------mobile page structure*/
+/*----------------------------mobile page structure*/
 
 #browser {
     background: #000 -moz-linear-gradient(top, #0e0e0e, #313131);
@@ -78,7 +78,7 @@ a {
     height: 100%;
 }
 
-    /*----------------------------nav bar*/
+/*----------------------------nav bar*/
 nav.primary > ul {
     text-align: center;
 }
@@ -94,7 +94,7 @@ nav.primary > ul li a {
     color: #fff;
 }
 
-    /*----------------------------pages*/
+/*----------------------------pages*/
 
 #home-page {
     background-color: #6495ed;
@@ -114,7 +114,7 @@ nav.primary > ul li a {
     height: 100%;
 }
 
-    /*----------------------------utils */
+/*----------------------------utils */
 
 .stage-center {
     top: 0;
@@ -140,7 +140,7 @@ nav.primary > ul li a {
     -o-transition-duration: .5s;
 }
 
-    /*----------------------------flip transition */
+/*----------------------------flip transition */
 #back,
 #front {
     position: absolute;
@@ -165,16 +165,16 @@ nav.primary > ul li a {
     -webkit-transform: rotateY(180deg);
 }
 
-    /*----------------------------device specific styles*/
+/*----------------------------device specific styles*/
 
     /* iOS/android phone landscape screen width*/
 @media screen and (max-device-width: 480px) and (orientation:landscape) {
     .stage-left {
-        left: -480px;
+        translate3d(-480px,0,0);
     }
 
     .stage-right {
-        left: 480px;
+        translate3d(480px,0,0);
     }
 
     .page {
@@ -183,14 +183,14 @@ nav.primary > ul li a {
 
 }
 
-    /* iOS/android phone portrait screen width*/
+/* iOS/android phone portrait screen width*/
 @media screen and (max-device-width: 320px) and (orientation:portrait) {
     .stage-left {
-        left: -320px;
+        translate3d(-320px,0,0);
     }
 
     .stage-right {
-        left: 320px;
+        translate3d(320px,0,0);
     }
 
     .page {
@@ -198,14 +198,14 @@ nav.primary > ul li a {
     }
 }
 
-    /*catch all for at or larger than handheld landscape device widths*/
+/*catch all for at or larger than handheld landscape device widths*/
 @media screen and (min-device-width: 481px) {
     .stage-left {
-        left: -1024px;
+        translate3d(-1024px,0,0);
     }
 
     .stage-right {
-        left: 1024px;
+        translate3d(1024px,0,0);
     }
 
     .page {
@@ -275,7 +275,7 @@ function slideTo(target) {
     new Slider("page-container", "sliderFill", FOCUS_PAGE.id, 100, 0,null);
 }
 
-function flip(id) {               9
+function flip(id) {
     //get a handle on the flippable region
     var front = getElement('front');
     var back = getElement('back');

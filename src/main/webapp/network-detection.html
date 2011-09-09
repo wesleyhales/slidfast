@@ -65,14 +65,14 @@ window.addEventListener("online", function(e) {
   processOnline(e.type);
 }, false);
 
-function processOnline(event){
+function processOnline(eventType){
 
     setupApp();
     checkAppCache();
 
     //reset our once disabled offline links
-    if(event){
-        for (i = 0; i < disabledLinks.length; i += 1) {
+    if(eventType){
+        for (var i = 0; i < disabledLinks.length; i ++) {
             disabledLinks[i].onclick = null;
         }
     }
