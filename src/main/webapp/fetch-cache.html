@@ -45,12 +45,12 @@ function supports_local_storage() {
 var fetchAndCache = function() {
     //iterate through all nodes in this DOM to find all mobile pages we care about
     var pages = document.getElementsByClassName('page');
-    var i;
-    for (i = 0; i < pages.length; i += 1) {
+
+    for (var i = 0; i < pages.length; i ++) {
         //find all links
         var pageLinks = pages[i].getElementsByTagName('a');
-        var j;
-        for (j = 0; j < pageLinks.length; j += 1) {
+
+        for (var j = 0; j < pageLinks.length; j ++) {
             var link = pageLinks[j];
 
             if (link.hasAttribute('href') &&
@@ -146,9 +146,8 @@ var insertPages = function(text, originalLink) {
     //now we have a DOM to work with
     var incomingPages = frame.getElementsByClassName('page');
 
-    var i;
     var pageCount = incomingPages.length;
-    for (i = 0; i < pageCount; i += 1) {
+    for (var i = 0; i < pageCount; i ++) {
         //the new page will always be at index 0 because
         //the last one just got popped off the stack with appendChild (below)
         var newPage = incomingPages[0];
