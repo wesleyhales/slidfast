@@ -126,14 +126,13 @@ function processOffline() {
     setupApp();
     //disable external links until we come back - setting the bounds of app
     disabledLinks = getUnconvertedLinks(document);
-    var i;
     //helper for onlcick below
     var onclickHelper = function(e){
         return function(f) {
             alert('This app is currently offline and cannot access the hotness');return false;
         }
     };
-    for (i = 0; i < disabledLinks.length; i += 1) {
+    for (var i = 0; i < disabledLinks.length; i ++) {
         if(disabledLinks[i].onclick == null){
         //alert user we're not online
         disabledLinks[i].onclick = onclickHelper(disabledLinks[i].href);
