@@ -178,3 +178,11 @@ nav.primary > ul li a {
 
     }
 }
+
+.android-warning {
+    background-color: #777;
+    border: 1px solid #111;
+    margin: 0 auto;
+    padding:  5px;
+    text-align: right;
+}

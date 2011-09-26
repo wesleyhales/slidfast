@@ -1,3 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<title>HTML5Rocks Article - Android Slide, Flip</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0"/>
+<!-- enable full-screen mode -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<!-- controls the appearance of the status bar in full-screen mode -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="styles/demo1.css" type="text/css"/>
+
+<script type="text/javascript">
 
 //demo1----------------------------slide/flip transition
 
@@ -35,7 +49,8 @@ function slideTo(target) {
 
     //3a.)Flip if needed
     var frontNodes = document.getElementById('front').getElementsByTagName('*');
-    for (var i = 0; i < frontNodes.length; i ++) {
+    var i;
+    for (i = 0; i < frontNodes.length; i += 1) {
         if(target.id == frontNodes[i].id && FLIPPED){
            flip();
         }
@@ -85,6 +100,9 @@ function Slider(track, backfill, page, maxRange, currentPos,callback)
     backfill = document.getElementById(backfill);
     page = document.getElementById(page);
     currentPos = page.style.left;
+
+    var thumbWidth = 20;
+    var borderWidth = 10;
 
     var originalTouch = 0;
     var originalX = 0;
@@ -220,3 +238,45 @@ function log(statement){
     var currentText = log.innerHTML;
     log.innerHTML = (new Date()).toTimeString() + ': ' + statement + '<br/>' + currentText;
 }
+
+
+</script>
+
+</head>
+<body onload="hideURLbar()">
+<div id="browser">
+    <div class="android-warning">View this in landscape mode</div>
+    <nav class="primary">
+        <ul>
+            <li><a href="#" onclick="slideTo('home-page')">Home</a></li>
+            <li><a href="#" onclick="slideTo('products-page')">Products</a></li>
+            <li><a href="#" onclick="slideTo('about-page')">About</a></li>
+        </ul>
+    </nav>
+
+    <div id="page-container">
+
+        <div id="front" class="normal">
+            <div id="home-page" class="page">
+                <h1>Home Page</h1>
+            </div>
+
+            <div id="products-page" class="page stage-right">
+                <h1>Products Page</h1>
+            </div>
+
+            <div id="about-page" class="page stage-left">
+                <h1>About Page</h1>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+</body>
+  <script type="text/javascript">
+
+
+        </script>
+</html>

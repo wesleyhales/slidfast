@@ -65,14 +65,14 @@ window.addEventListener("online", function(e) {
   processOnline(e.type);
 }, false);
 
-function processOnline(eventType){
+function processOnline(event){
 
     setupApp();
     checkAppCache();
 
     //reset our once disabled offline links
-    if(eventType){
-        for (var i = 0; i < disabledLinks.length; i ++) {
+    if(event){
+        for (i = 0; i < disabledLinks.length; i += 1) {
             disabledLinks[i].onclick = null;
         }
     }
@@ -126,13 +126,14 @@ function processOffline() {
     setupApp();
     //disable external links until we come back - setting the bounds of app
     disabledLinks = getUnconvertedLinks(document);
+    var i;
     //helper for onlcick below
     var onclickHelper = function(e){
         return function(f) {
             alert('This app is currently offline and cannot access the hotness');return false;
         }
     };
-    for (var i = 0; i < disabledLinks.length; i ++) {
+    for (i = 0; i < disabledLinks.length; i += 1) {
         if(disabledLinks[i].onclick == null){
         //alert user we're not online
         disabledLinks[i].onclick = onclickHelper(disabledLinks[i].href);
@@ -140,8 +141,6 @@ function processOffline() {
         }
     }
 }
-
-
 
 //    demo3----------------------------checking network type end
 

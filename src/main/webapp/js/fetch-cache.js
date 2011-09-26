@@ -7,13 +7,16 @@ function supports_local_storage() {
   }
 }
 
-var fetchAndCache = function() {
+
+var getUnconvertedLinks = function(node,classname){
     //iterate through all nodes in this DOM to find all mobile pages we care about
-    var pages = document.getElementsByClassName('page');
+    var links = new Array;
+    var pages = node.getElementsByClassName('page');
     var i;
     for (i = 0; i < pages.length; i += 1) {
         //find all links
         var pageLinks = pages[i].getElementsByTagName('a');
+
         var j;
         for (j = 0; j < pageLinks.length; j += 1) {
             var link = pageLinks[j];
@@ -21,23 +24,40 @@ var fetchAndCache = function() {
             if (link.hasAttribute('href') &&
             //'#' in the href tells us that this page is already loaded in the dom - and
             // that it links to a mobile transition/page
-                !(/[\#]/g).test(link.href) &&
-                //check for an explicit class name setting to fetch this link
-                (link.className.indexOf('fetch') >= 0))  {
-                 //fetch each url concurrently
-                 var ai = new ajax(link,function(text,url){
-                      //insert the new mobile page into the DOM
-                     insertPages(text,url);
-                 });
-                 ai.doGet();
+                !(/[\#]/g).test(link.href)) {
+                //check for an explicit class name setting to filter this link
+                if (classname != null) {
+                    if(link.className.indexOf(classname) >= 0)  {
+                          links.push(link);
+                    }
+                }else if (classname == null && link.className == ''){
+                //return unfiltered list
+                      links.push(link);
+                }
+
+
             }
         }
+    }
+    return links;
+};
+
+
+var fetchAndCache = function(async) {
+    var links = getUnconvertedLinks(document,'fetch');
+
+    var i;
+    for (i = 0; i < links.length; i += 1) {
+         var ai = new ajax(links[i],function(text,url){
+              //insert the new mobile page into the DOM
+             insertPages(text,url);
+         },async);
+         ai.doGet();
     }
 };
 
 function cacheExternalImage(url) {
     var img = new Image(); // width, height values are optional params
-    //http://blog.chromium.org/2011/07/using-cross-domain-images-in-webgl-and.html
     //remote server has to support CORS
     img.crossOrigin = '';
     img.src = url;
@@ -58,8 +78,7 @@ function cacheExternalImage(url) {
     return img
 }
 
-function ajax(url, callback) {
-
+function ajax(url, callback, async) {
     var req = init();
     req.onreadystatechange = processRequest;
 
@@ -75,7 +94,15 @@ function ajax(url, callback) {
       if (req.readyState == 4) {
         if (req.status == 200) {
             if (supports_local_storage()) {
-                localStorage[url] = req.responseText;
+                try{
+                    localStorage[url] = req.responseText;
+                }catch(e){
+                    if (e.name == 'QUOTA_EXCEEDED_ERR') {
+                        //write this markup to a server-side
+                        //cache or extension of localStorage
+                         alert('Quota exceeded!');
+                    }
+                }
             }
             if (callback) callback(req.responseText,url);
         }else {
@@ -90,12 +117,13 @@ function ajax(url, callback) {
     }
 
     this.doGet = function() {
-      req.open("GET", url, true);
-      req.send(null);
+       req.open("GET",  url + "?timestamp=" + new Date().getTime(), async);
+       req.send(null);
+
     }
 
     this.doPost = function(body) {
-      req.open("POST", url, true);
+      req.open("POST", url, async);
       req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       req.send(body);
     }
@@ -104,8 +132,6 @@ function ajax(url, callback) {
 var count = 0;
 var insertPages = function(text, originalLink) {
     var frame = getFrame();
-    //write the ajax response text to the frame and let
-    //the browser do the work
     frame.write(text);
 
     //now we have a DOM to work with
@@ -113,6 +139,12 @@ var insertPages = function(text, originalLink) {
 
     var i;
     var pageCount = incomingPages.length;
+    //helper for onlcick below
+    var onclickHelper = function(e){
+        return function(f) {
+            slideTo(e);
+        }
+    };
     for (i = 0; i < pageCount; i += 1) {
         //the new page will always be at index 0 because
         //the last one just got popped off the stack with appendChild (below)
@@ -124,7 +156,6 @@ var insertPages = function(text, originalLink) {
 
         //find out where to insert
         var location = newPage.parentNode.id == 'back' ? 'back' : 'front';
-        //alert();
         try{
             //mobile safari will not allow nodes to be transferred from one DOM to another so
             //we must use adoptNode()
@@ -135,11 +166,11 @@ var insertPages = function(text, originalLink) {
         //this is where prefetching multiple "mobile" pages embedded in a single html page gets tricky.
         //we may have N embedded pages, so how do we know which node/page this should link/slide to?
         //for now we'll assume the first *-page in the "front" node is where this links to.
-        if(originalLink.getAttribute('onclick') == null){
-            //set the original link for transition
-            originalLink.setAttribute('onclick', 'slideTo(\'' + newPage.id + '\')');
+        if(originalLink.onclick == null){
             //todo set the href for ajax bookmark (override back button)
             originalLink.setAttribute('href', '#');
+            //set the original link for transition
+            originalLink.onclick = onclickHelper(newPage.id);
         }
     }
 }
