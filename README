@@ -1,1 +1,8 @@
+SlidFast is a minimalistic framework to writing mobile web apps.
+It utilizes core HTML5 APIs for today's mobile web browsers.
+
+Read more about the approach here:
+http://www.html5rocks.com/en/mobile/optimization-and-performance.html
+
+Deploy to Google App Engine:
 mvn gae:deploy
