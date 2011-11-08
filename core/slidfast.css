@@ -20,8 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  *  Author: Wesley Hales
- *  Description: SlidFast is a minimalistic framework to writing mobile web apps.
+ *  Description: SlidFast is a minimalistic framework for writing mobile web apps.
  *  It utilizes core HTML5 APIs for today's mobile web browsers.
+ *
+ *  version: 1.0.0.Alpha
  */
 
 html {

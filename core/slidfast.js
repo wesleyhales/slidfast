@@ -22,6 +22,8 @@
  *  Author: Wesley Hales
  *  Description: SlidFast is a minimalistic framework for writing mobile web apps.
  *  It utilizes core HTML5 APIs for today's mobile web browsers.
+ *
+ *  version: 1.0.0.Alpha
  */
 
 var slidfast = {
