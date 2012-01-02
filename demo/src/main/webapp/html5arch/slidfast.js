@@ -1,83 +1,99 @@
-/*!
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *  Author: Wesley Hales
- *  Description: SlidFast is a minimalistic framework for writing mobile web apps.
- *  It utilizes core HTML5 APIs for today's mobile web browsers.
- *
- *  version: 1.0.0.Alpha
- */
+//Known issues:
+//1. When page "flip" is activated after accelerating a touch event,
+// a double acceleration glitch occurs when flipping to the back page
 
 //optimize for minification and performance
 (function(window,document,undefined){
 
-    //var slidfast = (function(){
+    var slidfast = (function(){
 
-        var slidfast = function(options){
-            return new slidfast.fn.init(options);
+        var slidfast = function(startupOptions){
+            options = startupOptions;
+            return new slidfast.core.init();
         },
+
+        options,
 
         defaultPageID = "",
 
-        defaultPageHash = "",
+        touchEnabled = false,
 
-        focusPage =  "",
+        focusPage =  null,
 
-        isReady = false;
+        isReady = false,
 
-        slidfast.fn = slidfast.prototype = {
+        flipped = false;
+
+        slidfast.core = slidfast.prototype = {
             constructor: slidfast,
 
             start: function() {
-                hideURLBar();
-                //set the default page
-                focusPage = document.getElementById(defaultPageID);
-                locationChange();
+                if(options){
+                    defaultPageID = options.defaultPageID;
+                    touchEnabled = options.touchEnabled;
+                }
+                try{
+                    slidfast.core.hideURLBar();
+
+                    if(touchEnabled){
+                        new slidfast.ui.Touch(getElement(defaultPageID));
+                    }
+
+                }catch(e){
+                    alert('You must define the page ID as default parameters. \n Error:' + e)
+                }
             },
-
-
-
 
             hideURLBar: function() {
                 //hide the url bar on mobile devices
                 setTimeout(scrollTo, 0, 0, 1)
             },
 
-            slideTo :   function (id) {
-                //check for double hash change call and no hash scenario on
-                //initial page load.
-                if (id == focusPage.id && (location.hash != "#" + defaultPageHash && location.hash != '')) {
-                    return;
+            init: function() {
+
+                window.addEventListener('load', function(e) {
+                    isReady = true;
+                    slidfast.core.start(defaultPageID, touchEnabled);
+                }, false);
+
+                return slidfast.core;
+
+            }
+
+        };
+
+        slidfast.core.init.prototype = slidfast.core;
+
+        slidfast.ui = slidfast.prototype = {
+
+            slideTo : function(id) {
+
+                if(!focusPage) {
+                    focusPage = getElement(defaultPageID);
                 }
-                var focusPage = focusPage;
+
                 //1.)the page we are bringing into focus dictates how
                 // the current page will exit. So let's see what classes
                 // our incoming page is using. We know it will have stage[right|left|etc...]
-                var classes = document.getElementById(id).className.split(' ');
+                var classes = getElement(id).className.split(' ');
 
                 //2.)decide if the incoming page is assigned to right or left
                 // (-1 if no match)
                 var stageType = classes.indexOf('stage-left');
 
-                //3.) decide how this focused page should exit.
+                //3a.)Flip if needed
+                var front = getElement('front');
+                if(front){
+                    var frontNodes = front.getElementsByTagName('*');
+                    var i;
+                    for (i = 0; i < frontNodes.length; i += 1) {
+                        if(focusPage.id == frontNodes[i].id && flipped){
+                           slidfast.ui.flip();
+                        }
+                    }
+                }
+
+                //3b.) decide how this focused page should exit.
                 if (stageType > 0) {
                     focusPage.className = 'page transition stage-right';
                 } else {
@@ -85,80 +101,190 @@
                 }
 
                 //4. refresh/set the variable
-                focusPage = focusPage = document.getElementById(id);
+                focusPage = document.getElementById(id);
 
-                //5. Bring in the new page and set the global.
+                //5. Bring in the new page.
                 focusPage.className = 'page transition stage-center';
 
-            },
-
-            init: function(options) {
-
-                if(options){
-                    defaultPageID = options.defaultPageID;
-                    defaultPageHash = options.defaultPageHash;
+                if(touchEnabled){
+                    new slidfast.ui.Touch(focusPage);
                 }
 
-                window.addEventListener('load', function(e) {
-                    slidfast.isReady = true;
-                    slidfast.start(slidfast.defaultPageID, slidfast.defaultPageHash);
-
-                }, false);
-                window.addEventListener('hashchange', function(e) {
-                    slidfast.locationChange();
-                }, false);
-
             },
 
-            locationChange: function() {
-                if (location.hash === "#" + defaultPageHash || location.hash == '') {
-                    slideTo(defaultPageID);
-                    //we're on the default page, so no need for back button
-                    document.getElementById("back-button").className = 'hide-button';
-                } else {
-                    var hashArray = location.hash.split(':');
-                    var id;
-                    var sample;
-                    if (hashArray.length === 2) {
-                        id = hashArray[0].replace('#', '');
-                        sample = hashArray[1];
-                        handleHashChange(id, sample);
-                        //show the back button and attach functions
-                        document.getElementById("back-button").className = 'basic-button left-header-button';
-                        document.getElementById("back-button").onclick = function() {
-                            slidfast.slideTo(slidfast.defaultPageID);
-                            location.hash = slidfast.defaultPageHash;
-                        };
-                    }
 
-                }
-            },
-
-            flip: function() {
+            flip : function() {
                 //get a handle on the flippable region
                 var front = document.getElementById('front');
                 var back = document.getElementById('back');
 
                 //just a simple way to see what the state is
                 var classes = front.className.split(' ');
-                var flipped = classes.indexOf('flipped');
+                var flippedClass = classes.indexOf('flipped');
 
-                if (flipped >= 0) {
+                if (flippedClass >= 0) {
                     //already flipped, so return to original
                     front.className = 'normal';
                     back.className = 'flipped';
+                    flipped = false;
                 } else {
                     //do the flip
                     front.className = 'flipped';
                     back.className = 'normal';
-
+                    flipped = true;
                 }
+            },
+
+            Touch : function(e) {
+                var page = e;
+                //todo - tie to markup for now
+                var track = document.getElementById("page-container");
+                var currentPos = page.style.left;
+
+                var originalTouch = 0;
+
+                var slideDirection = null;
+                var cancel = false;
+                var swipeThreshold = 201;
+
+                var swipeTime;
+                var timer;
+                var maxPos;
+
+                function pageMove(event) {
+                    //get position after transform
+                    var curTransform = new WebKitCSSMatrix(window.getComputedStyle(page).webkitTransform);
+                    var pagePosition = curTransform.m41;
+
+                    //make sure finger is not released
+                    if(event.type != 'touchend'){
+                        //holder for current x position
+                        var currentTouch = event.touches[0].clientX;
+
+                        if(event.type == 'touchstart'){
+                            //reset measurement to 0 each time a new touch begins
+                            originalTouch = event.touches[0].clientX;
+                            timer = timerStart();
+                        }
+
+                        //get the difference between where we are now vs. where we started on first touch
+                        currentPos = currentTouch - originalTouch;
+
+                        //figure out if we are cancelling the swipe event
+                        //simple gauge for finding the highest positive or negative number
+                        if(pagePosition < 0){
+                           if(maxPos < pagePosition) {
+                                cancel = true;
+                            }else{
+                                maxPos = pagePosition;
+                            }
+                        }else{
+                            if(maxPos > pagePosition) {
+                                cancel = true;
+                            }else {
+                                maxPos = pagePosition;
+                            }
+                        }
+
+                    }else{
+                        //touch event comes to an end
+                        swipeTime = timerEnd(timer,'numbers2');
+                        currentPos = 0;
+
+                        //how far do we go before a page flip occurs
+                        var pageFlipThreshold = 75;
+
+                        if(!cancel){
+                            //find out which direction we're going on x axis
+                            if(pagePosition >= 0){
+                            //moving current page to the right
+                            //so means we're flipping backwards
+                               if((pagePosition > pageFlipThreshold) || (swipeTime < swipeThreshold)){
+                                   //user wants to go backward
+                                   slideDirection = 'right';
+                                }else{
+                                   slideDirection = null;
+                                }
+                            }else{
+                            //current page is sliding to the left
+                                if((swipeTime < swipeThreshold) || (pagePosition < pageFlipThreshold)){
+                                   //user wants to go forward
+                                   slideDirection = 'left';
+                                }else{
+                                   slideDirection = null;
+                                }
+
+                            }
+                        }
+                        maxPos = 0;
+                        cancel = false;
+                    }
+
+                    positionPage();
+                }
+
+                function positionPage(end){
+                    page.style.webkitTransform = 'translate3d('+ currentPos + 'px, 0, 0)';
+                    if(end){
+                        page.style.WebkitTransition = 'all .4s ease-out';
+                        //page.style.WebkitTransition = 'all .4s cubic-bezier(0,.58,.58,1)'
+                    }else{
+                        page.style.WebkitTransition = 'all .2s ease-out';
+                    }
+                    page.style.WebkitUserSelect = 'none';
+                }
+
+                track.ontouchstart = function(event) {
+                //alert(event.touches[0].clientX);
+                    pageMove(event);
+                };
+                track.ontouchmove = function(event) {
+                    event.preventDefault();
+                    pageMove(event);
+                };
+                track.ontouchend = function(event) {
+                    pageMove(event);
+                    if(slideDirection == 'left'){
+                       slidfast.ui.slideTo('products-page');
+                    }else if (slideDirection == 'right'){
+                       slidfast.ui.slideTo('home-page');
+                    }
+                };
+
+                positionPage(true);
+
             }
+
+
+
         };
 
- //   })();
+
+        var getElement = function(id) {
+            return document.getElementById(id)
+        };
+
+        var timerStart = function() {
+            return (new Date()).getTime();
+        };
+
+        var timerEnd = function(start, id) {
+            return ((new Date()).getTime() - start);
+        };
+
+        var log = function(statement){
+            var log = getElement('log');
+            var currentText = log.innerHTML;
+            log.innerHTML = (new Date()).toTimeString() + ': ' + statement + '<br/>' + currentText;
+        };
 
 
-})(this,document);
+        return slidfast;
+
+    })();
+
+window.slidfast = slidfast;
+})(window,document);
+
 
 
