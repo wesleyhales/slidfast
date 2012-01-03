@@ -159,6 +159,7 @@
 
                     //find out where to insert
                     var location = newPage.parentNode.id == 'back' ? 'back' : 'front';
+
                     try{
                         //mobile safari will not allow nodes to be transferred from one DOM to another so
                         //we must use adoptNode()
@@ -252,7 +253,6 @@
         slidfast.ui = slidfast.prototype = {
 
             slideTo : function(id) {
-
                 if(!focusPage) {
                     focusPage = getElement(defaultPageID);
                 }
@@ -272,7 +272,7 @@
                     var frontNodes = front.getElementsByTagName('*');
                     var i;
                     for (i = 0; i < frontNodes.length; i += 1) {
-                        if(focusPage.id == frontNodes[i].id && flipped){
+                        if(id == frontNodes[i].id && flipped){
                            slidfast.ui.flip();
                         }
                     }
