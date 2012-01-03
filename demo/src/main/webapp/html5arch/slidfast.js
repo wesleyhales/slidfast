@@ -48,6 +48,7 @@
                 }
 
                 slidfast.core.hideURLBar();
+                slidfast.core.locationChange();
 
                 if(touchEnabled){
                     new slidfast.ui.Touch(getElement(defaultPageID));
@@ -77,8 +78,27 @@
                     slidfast.core.start(defaultPageID, touchEnabled);
                 }, false);
 
+                window.addEventListener('hashchange', function(e) {
+                    slidfast.core.locationChange();
+                }, false);
+
                 return slidfast.core;
 
+            },
+
+            locationChange: function() {
+                if (location.hash === "#" + defaultPageID || location.hash == '') {
+                    slidfast.ui.slideTo(defaultPageID);
+                } else {
+
+                    try{
+                        //todo - give the hash a safe namespace
+                        slidfast.ui.slideTo(location.hash.replace('#', ''));
+                    }catch(e){
+                        alert('you must define an a4j:jsFunction component with name=\"handleHashChange\"')
+                    }
+
+                }
             },
 
             ajax : function(url, callback, async){
@@ -290,6 +310,9 @@
 
                 //5. Bring in the new page.
                 focusPage.className = 'page transition stage-center';
+
+                //6. make this transition bookmarkable
+                location.hash = focusPage.id;
 
                 if(touchEnabled){
                     new slidfast.ui.Touch(focusPage);
