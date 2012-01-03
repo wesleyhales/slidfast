@@ -34,7 +34,7 @@ Mobile Device Page Setup
     position: absolute;
     width: 100%;
     height: 100%;
-    top: 0;
+    /*top: 0;*/
     background-color: #fff;
     /*activate the GPU for compositing each page */
     /*-webkit-transform: translate3d(0, 0, 0);*/
@@ -74,11 +74,6 @@ Flip Transition
     -webkit-backface-visibility: hidden;
     -webkit-transition-duration: .5s;
     -webkit-transform-style: preserve-3d;
-z-index: 2;
-}
-
-#back {
-   z-index: 3;
 }
 
 .normal {
@@ -103,56 +98,12 @@ Device Specific Styles
     height:100%;
     overflow: hidden;
 }
-/* iOS/android phone landscape screen width*/
-@media screen and (max-device-width: 480px) and (orientation:landscape) {
-    .stage-left {
-        left: -480px;
-    }
 
-    .stage-right {
-        left: 480px;
-    }
+.stage-left {
+    left: -100%;
 }
 
-@media screen and (max-device-width: 480px) and (orientation:portrait) {
-    .stage-left {
-        left: -320px;
-    }
-
-    .stage-right {
-        left: 320px;
-    }
+.stage-right {
+    left: 100%;
 }
 
-@media screen and (min-device-width: 600px) and (orientation:portrait) {
-    .stage-left {
-        left: -600px;
-    }
-
-    .stage-right {
-        left: 600px;
-    }
-}
-
-/* iOS/android phone portrait screen width*/
-@media screen and (max-device-width: 320px) {
-    .stage-left {
-        left: -320px;
-    }
-
-    .stage-right {
-        left: 320px;
-    }
-}
-
-/*catch all for at or larger than handheld landscape device widths*/
-@media screen and (min-device-width: 1000px) {
-    .stage-left {
-        left: -1024px;
-    }
-
-    .stage-right {
-        left: 1024px;
-    }
-
-}
