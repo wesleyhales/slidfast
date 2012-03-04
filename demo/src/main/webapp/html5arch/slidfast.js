@@ -93,9 +93,11 @@
 
                     try{
                         //todo - give the hash a safe namespace
-                        slidfast.ui.slideTo(location.hash.replace('#', ''));
+                        targetId = location.hash;
+                        slidfast.ui.slideTo(targetId.replace('#sf-', ''));
                     }catch(e){
-                        alert('you must define an a4j:jsFunction component with name=\"handleHashChange\"')
+                        console.log(e)
+                        //alert(e)
                     }
 
                 }
@@ -312,7 +314,7 @@
                 focusPage.className = 'page transition stage-center';
 
                 //6. make this transition bookmarkable
-                location.hash = focusPage.id;
+                location.hash = '#sf-' + focusPage.id;
 
                 if(touchEnabled){
                     new slidfast.ui.Touch(focusPage);
@@ -346,7 +348,7 @@
             Touch : function(e) {
                 var page = e;
                 //todo - tie to markup for now
-                var track = document.getElementById("page-container");
+                var track = getElement("page-container");
                 var currentPos = page.style.left;
 
                 var originalTouch = 0;
@@ -590,9 +592,12 @@
 
         }
 
-
         var getElement = function(id) {
-            return document.getElementById(id)
+            if (document.querySelector){
+                return document.querySelector('#' + id);
+            }else{
+                return document.getElementById(id);
+            }
         };
 
         var timerStart = function() {
@@ -633,6 +638,5 @@
 
 window.slidfast = slidfast;
 })(window,document);
-
 
 
